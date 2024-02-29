@@ -3,8 +3,7 @@
 
 #include "ui_mainwindow.h"
 #include <QMainWindow>
-#include <QFrame>
-#include <QPainter>
+#include <QtCharts>
 
 class MainWindow : public QMainWindow
 {
@@ -18,23 +17,9 @@ public:
 //    Ui::MainWindow *ui;
 
 private:
-    QFrame *greenPatch;
     Ui::MainWindow *ui;
-
-    /*
-protected:
-    void paintEvent(QPaintEvent *event) override {
-        QMainWindow::paintEvent(event);
-
-        QPainter painter(this);
-
-        // Draw a flower
-        painter.setBrush(Qt::red); // Set brush color to red for the petals
-        painter.drawEllipse(50, 50, 20, 20); // Draw the petals
-        painter.setBrush(Qt::yellow); // Set brush color to yellow for the center
-        painter.drawEllipse(57, 57, 6, 6); // Draw the center of the flower
-    }
-*/
+    QLineSeries *series;
+    QChart *chart;
 };
 
 #endif // MAINWINDOW_H

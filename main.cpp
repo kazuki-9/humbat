@@ -1,19 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-/*
- * for benchmarking
-#include <iostream>
-#include <chrono>
-
-using namespace std;
-
- * from here my project related
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsRectItem>
-*/
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -49,22 +36,4 @@ int main(int argc, char *argv[])
     return 0;
 */
 
-/*
-     * (commented out: giving flexibility to the greenPatch
-     *
-    QApplication app(argc, argv);
-
-    // create a QGraphicsScene
-    QGraphicsScene scene;
-
-    // Create a QGraphics Rect Item with a green color
-    QGraphicsRectItem * greenPatch = scene.addRect(0, 0, 100, 100, QPen(Qt::NoPen), QBrush(Qt::green));
-
-    // Create a display
-    QGraphicsView view(&scene);
-    view.show();
-
-    return app.exec();
-
-*/
 }
