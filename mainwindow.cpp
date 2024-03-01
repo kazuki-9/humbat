@@ -14,7 +14,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // create the green patch
 //    ui->patch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->patch->setStyleSheet("background-color: yellowGreen;");
+    //  ui->patch->setStyleSheet("QFrame {background-color: yellowGreen }");
+
+    QChartView *chartView = ui->patch; // Get the QChartView from the UI
+    QChart *chart = chartView->chart(); // Get the chart associated with the QChartView
+    chart->setBackgroundBrush(QBrush(QColorConstants::Svg::yellowgreen)); // Set the desired background color
+
 //    QFrame *greenPatch = new QFrame(this);
 //    greenPatch -> setStyleSheet("background-color: yellowGreen;");
 //    greenPatch -> setFixedSize(600, 600);

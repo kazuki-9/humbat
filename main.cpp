@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "flower.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -7,6 +8,7 @@ int main(int argc, char *argv[])
 
     MainWindow mainWindow;
     mainWindow.show();
+    drawFlower(mainWindow.ui->patch, 100, 100); //@ Call the drawFlower function
 
     return app.exec();
 

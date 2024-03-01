@@ -10,14 +10,15 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow(); //@ Declaration of the destructor
+    MainWindow(QWidget *parent = nullptr); // Declaration of the constructor
+    Ui::MainWindow *ui;
+    ~MainWindow(); // Declaration of the destructor
 
 //private:
 //    Ui::MainWindow *ui;
 
 private:
-    Ui::MainWindow *ui;
+
     QLineSeries *series;
     QChart *chart;
 };
