@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include "ui_mainwindow.h"
+#include <QGraphicsScene>
 #include <QMainWindow>
-#include <QtCharts>
-#include <QLineSeries>
-#include <QChart>
+
+//#include <QtCharts>
+//#include <QLineSeries>
+//#include <QChart>
 
 class MainWindow : public QMainWindow
 {
@@ -17,17 +19,29 @@ public:
     ~MainWindow(); // Declaration of the destructor
 
     void paintEvent(QPaintEvent *event); // Declaration of the paintEvent function
-//private:
-//    Ui::MainWindow *ui;
     void  setupFlowers(); //?? should it be under private slots ?
 
 private slots:
-    void on_setup_flowers_clicked();
+    void on_setup_clicked();
+
 
 private:
     Ui::MainWindow *ui;
-    QLineSeries *series;
-    QChart *chart;
+
+    // Parameters
+    const unsigned x_map = 300;
+    const unsigned y_map = 300;
+
+    // QImage
+    QImage image;
+    std::vector<QRgb> color;
+    QGraphicsScene *scene;
+
+    // Functions
+    void setup_map();
+    void setup_flowers();
+    //   void updateMaps();  //@ not yet constructed but maybe useful later
+
 };
 
 #endif // MAINWINDOW_H

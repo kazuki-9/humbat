@@ -14,27 +14,27 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QChartView" name="patch">
+   <widget class="QPushButton" name="setup">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>581</width>
-      <height>331</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="setup_flowers">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>390</y>
+      <x>50</x>
+      <y>380</y>
       <width>80</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
      <string>Set up</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="map">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>20</y>
+      <width>641</width>
+      <height>341</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -50,13 +50,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QChartView</class>
-   <extends>QGraphicsView</extends>
-   <header location="global">QChartView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
