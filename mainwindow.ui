@@ -24,6 +24,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="setup_flowers">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>390</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set up</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
     MainWindow mainWindow;
     mainWindow.show();
-    drawFlower(mainWindow.ui->patch, 100, 100); //@ Call the drawFlower function
+//    drawFlower(mainWindow.ui->patch, 100, 100); //@ Call the drawFlower function
 
     return app.exec();
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     cout << "This took about: " << diff.count() << " seconds" << endl;
 
-    return 0;
+    return 0;  // return 0 means the program ran successfully
 */
 
 }

@@ -1,5 +1,8 @@
 #include "flower.h"
 
+
+
+
 void flower::drawFlower(QPainter *painter, int x, int y) {
     // Draw a flower
     painter->setBrush(Qt::red); // Set brush color to red for the petals
