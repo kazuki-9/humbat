@@ -19,7 +19,8 @@ public:
     ~MainWindow(); // Declaration of the destructor
 
     void paintEvent(QPaintEvent *event); // Declaration of the paintEvent function
-    void  setupFlowers(); //?? should it be under private slots ?
+
+
 
 private slots:
     void on_setup_clicked();
@@ -29,8 +30,10 @@ private:
     Ui::MainWindow *ui;
 
     // Parameters
-    const unsigned x_map = 300;
-    const unsigned y_map = 300;
+    const unsigned x_map = 100;
+    const unsigned y_map = 100;
+    const unsigned n_flowers = 10;
+
 
     // QImage
     QImage image;

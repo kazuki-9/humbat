@@ -6,11 +6,14 @@
 #define FLOWER_H
 
 #include <QPainter>
+#include <vector>
 
 class flower {
 public:
-    static void drawFlower(QPainter *painter, int x, int y);
-
+    flower();
+    std::vector<int> x_y_cor;
+    bool sex; // T = male, F = female
+    int corolla_size; // in mm
 };
 
 #endif // FLOWER_H

@@ -8,6 +8,31 @@
 //#include <QPainter>
 #include <QLineSeries>
 #include <QChart>
+#include <random>
+#include <QImage>
+#include <iostream>
+
+
+// declaration
+//MainWindow::MainWindow (
+//    const unsigned x_map,
+//    const unsigned y_map)
+//    {
+//    }
+
+int x_map = 100;
+int y_map = 100;
+// int y_map = y_map; // somehow this doesn't work and makes a super large number
+
+std::random_device rd;     // Only used once to initialise (seed) engine
+std::mt19937 rng(rd());    // Random-number engine used (Mersenne-Twister in this case)
+std::uniform_int_distribution<int> uni_x(0, x_map - 1); // Guaranteed unbiased
+std::uniform_int_distribution<int> uni_y(0, y_map - 1);
+
+
+bool test_add() {
+    return true;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -48,13 +73,19 @@ void MainWindow::setup_map() {
 void MainWindow::on_setup_clicked()
 {
     setup_flowers();
+//    for (int i = 0; i < 10; ++i) {
+//        std::cout  << uni_x(0, x_map - 1);
+//    }
 }
 
-
+std::vector<flower> flowers;
 
 void MainWindow::setup_flowers(){
-
-
+/// something like dispersing flowers randomly in the patch with the user-defined # of flowers
+    flowers.clear();
+    for (unsigned i = 0; i < n_flowers; i++) {
+        image.setPixelColor(uni_x(rng), uni_y(rng), Qt::yellow); // Randomly set the pixel color to yellow
+    }
     scene->addPixmap(QPixmap::fromImage(image));
 }
 
