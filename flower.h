@@ -6,6 +6,7 @@
 #define FLOWER_H
 
 #include <vector>
+#include <QImage>
 
 class flower {
 public:
@@ -13,13 +14,16 @@ public:
         std::vector<int> x_y_cor,
         bool sex, // T = male, F = female
         int corolla_size, // in mm
-        double death_rate // per year
+        double death_rate, // per year
+        int id
         );
 
     std::vector<int> x_y_cor;
     bool sex; // T = male, F = female
     int corolla_size; // in mm
     double death_rate; // per year
+    QRgb color;
+    int id;
 };
 
 #endif // FLOWER_H

@@ -17,11 +17,9 @@ public:
     MainWindow(QWidget *parent = nullptr); // Declaration of the constructor
     ~MainWindow(); // Declaration of the destructor
 
-    void paintEvent(QPaintEvent *event); // Declaration of the paintEvent function
-
 private slots:
     void on_setup_clicked();
-
+    void on_start_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -39,8 +37,7 @@ private:
     // Functions
     void setup_map();
     void setup_flowers();
-    //   void updateMaps();  //@ not yet constructed but maybe useful later
-
+    void update_map();
 };
 
 #endif // MAINWINDOW_H
