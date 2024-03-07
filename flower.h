@@ -5,15 +5,21 @@
 #ifndef FLOWER_H
 #define FLOWER_H
 
-#include <QPainter>
 #include <vector>
 
 class flower {
 public:
-    flower();
+    flower(
+        std::vector<int> x_y_cor,
+        bool sex, // T = male, F = female
+        int corolla_size, // in mm
+        double death_rate // per year
+        );
+
     std::vector<int> x_y_cor;
     bool sex; // T = male, F = female
     int corolla_size; // in mm
+    double death_rate; // per year
 };
 
 #endif // FLOWER_H

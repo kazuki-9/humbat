@@ -10,11 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     flower.cpp \
+    landscape.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     flower.h \
+    landscape.h \
     mainwindow.h
 
 FORMS += \
