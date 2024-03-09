@@ -42,7 +42,7 @@ private:
     void setup_flowers();
     void update_map();
 //    void draw_flower(QImage& image, const flower& flowers);
-    void draw_flower(QImage& image);
+    void draw_flower(QImage& image, const flower& f);
     void update_map_image();
 };
 

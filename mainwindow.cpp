@@ -110,10 +110,9 @@ void MainWindow::on_start_clicked()
 //      void simulateTime(std::vector<flower>& flowers) {
 
 void MainWindow::update_map() {
-    int iterationCount = 0;
     int maxIterations = 1000;
 
-    while (iterationCount < maxIterations) {
+for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
         for (auto it = flowers.begin(); it != flowers.end(); ) {
             auto& flower = *it;
 
@@ -138,7 +137,6 @@ void MainWindow::update_map() {
         update_map_image();
 
         // Increment the iteration counter
-        iterationCount++;
 
         // Sleep if needed
         // this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
@@ -147,12 +145,12 @@ void MainWindow::update_map() {
 
 void MainWindow::update_map_image() {
     // Clear the existing image
-    image.fill(Qt::transparent);
+    image.fill(QColor(Qt::green).lighter(130));
 
     // Draw all the flowers onto the image
     for (const auto& flower : flowers) {
 //        draw_flower(image, flower);
-        draw_flower(image);
+        draw_flower(image, flower);
     }
 
     // Update the scene with the new image
@@ -161,9 +159,8 @@ void MainWindow::update_map_image() {
 }
 
 //void MainWindow::draw_flower(QImage& image, const flower& flowers) {
-void MainWindow::draw_flower(QImage& image) {
-// Your code to draw a flower onto the image
-    // Use the flower's position, size, etc., to draw it on the image
+void MainWindow::draw_flower(QImage& image, const flower& flower) {
+// draw a flower onto the image
     for (const auto& flower : flowers) {
         // Redraw the flower if it's alive
         for (int dx = -flowerSize; dx <= flowerSize; dx++) {
@@ -176,8 +173,6 @@ void MainWindow::draw_flower(QImage& image) {
             }
         }
     }
-    // Update the scene with the new flower positions
-    scene->addPixmap(QPixmap::fromImage(image));
 }
 
 //void MainWindow::update_map() {
