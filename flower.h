@@ -12,18 +12,29 @@ class flower {
 public:
     flower(
         std::vector<int> xy_cor,
-        bool sex, // T = male, F = female
+        int age, // T = male, F = female
         int corolla_size, // in mm
         double death_rate, // per year
         int id
         );
 
     std::vector<int> xy_cor;
-    bool sex; // T = male, F = female
+    int age; // T = male, F = female
     int corolla_size; // in mm
     double death_rate; // per year
     QRgb color;
     int id;
+
+//    bool is_alive;
+
+    bool operator==(const flower& other) const;
+
+//private:
+//    std::vector<int> xy_cor;
+//    int age;
+//    int corolla_size;
+//    double death_rate;
+//    int id;
 };
 
 #endif // FLOWER_H
