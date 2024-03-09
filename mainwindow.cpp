@@ -108,43 +108,115 @@ void MainWindow::on_start_clicked()
 
 
 //      void simulateTime(std::vector<flower>& flowers) {
+
 void MainWindow::update_map() {
-     int flowerSize = 5;
-        int maxIterations = 1000;
+    int iterationCount = 0;
+    int maxIterations = 1000;
 
-        // ---------------------3------------------------
-        for (int iterationCount = 0; iterationCount < maxIterations; iterationCount++) {
-            // Iterate over the flowers vector
-            auto it = flowers.begin();
-            while (it != flowers.end()) {
-                // Simulate death
-                if (it->age > 100) {
-                    // Erase the flower from the vector if it's dead
-                    it = flowers.erase(it);
-                } else {
-                    // Increment the iterator if the flower is still alive
-                    ++it;
-                }
-            }
+    while (iterationCount < maxIterations) {
+        for (auto it = flowers.begin(); it != flowers.end(); ) {
+            auto& flower = *it;
 
-            // Update the scene with the current state of the flowers
-            scene->clear();
-            for (const auto& flower : flowers) {
-                // Redraw the flower if it's alive
-                for (int dx = -flowerSize; dx <= flowerSize; dx++) {
-                    for (int dy = -flowerSize; dy <= flowerSize; dy++) {
-                        // Check if the current pixel is within the circle
-                        if (dx * dx + dy * dy <= pow(flowerSize, 2)) {
-                            // Set the color of the pixel to represent the flower
-                            image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color
-                        }
-                    }
-                }
+            // Simulate death
+            if (flower.age > 100) {
+                // Remove the dead flower from the vector
+                it = flowers.erase(it);
+            } else {
+                // Update simulation or application state here
+
+                // Increment age of the flower
+                flower.age++;
+
+                // Move on to the next flower
+                ++it;
             }
-            // Update the scene with the new flower positions
-            scene->addPixmap(QPixmap::fromImage(image));
         }
 
+        // Add new flowers if needed (you can add your logic here)
+
+        // Update the map with the current state of flowers
+        update_map_image();
+
+        // Increment the iteration counter
+        iterationCount++;
+
+        // Sleep if needed
+        // this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
+    }
+}
+
+void MainWindow::update_map_image() {
+    // Clear the existing image
+    image.fill(Qt::transparent);
+
+    // Draw all the flowers onto the image
+    for (const auto& flower : flowers) {
+//        draw_flower(image, flower);
+        draw_flower(image);
+    }
+
+    // Update the scene with the new image
+    scene->clear();
+    scene->addPixmap(QPixmap::fromImage(image));
+}
+
+//void MainWindow::draw_flower(QImage& image, const flower& flowers) {
+void MainWindow::draw_flower(QImage& image) {
+// Your code to draw a flower onto the image
+    // Use the flower's position, size, etc., to draw it on the image
+    for (const auto& flower : flowers) {
+        // Redraw the flower if it's alive
+        for (int dx = -flowerSize; dx <= flowerSize; dx++) {
+            for (int dy = -flowerSize; dy <= flowerSize; dy++) {
+                // Check if the current pixel is within the circle
+                if (dx * dx + dy * dy <= pow(flowerSize, 2)) {
+                    // Set the color of the pixel to represent the flower
+                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color
+                }
+            }
+        }
+    }
+    // Update the scene with the new flower positions
+    scene->addPixmap(QPixmap::fromImage(image));
+}
+
+//void MainWindow::update_map() {
+//     int flowerSize = 5;
+//        int maxIterations = 1000;
+
+//        // ---------------------3------------------------
+//        for (int iterationCount = 0; iterationCount < maxIterations; iterationCount++) {
+//            // Iterate over the flowers vector
+//            auto it = flowers.begin();
+//            while (it != flowers.end()) {
+//                // Simulate death
+//                if (it->age > 100) {
+//                    // Erase the flower from the vector if it's dead
+//                    it = flowers.erase(it);
+//                } else {
+//                    // Increment the iterator if the flower is still alive
+//                    ++it;
+//                }
+//            }
+
+//            // Update the scene with the current state of the flowers
+//            scene->clear();
+//            for (const auto& flower : flowers) {
+//                // Redraw the flower if it's alive
+//                for (int dx = -flowerSize; dx <= flowerSize; dx++) {
+//                    for (int dy = -flowerSize; dy <= flowerSize; dy++) {
+//                        // Check if the current pixel is within the circle
+//                        if (dx * dx + dy * dy <= pow(flowerSize, 2)) {
+//                            // Set the color of the pixel to represent the flower
+//                            image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color
+//                        }
+//                    }
+//                }
+//            }
+//            // Update the scene with the new flower positions
+//            scene->addPixmap(QPixmap::fromImage(image));
+//        }
+//}
 
 // -------------------------2----------------------
 //    int maxIterations = 100;
@@ -216,4 +288,4 @@ void MainWindow::update_map() {
 //            if (iterationCount >= maxIterations) {
 //                break; // Exit the loop
         } */
-    }
+//    }

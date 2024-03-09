@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "flower.h"
 #include "ui_mainwindow.h"
 #include <QGraphicsScene>
 #include <QMainWindow>
@@ -16,6 +17,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr); // Declaration of the constructor
     ~MainWindow(); // Declaration of the destructor
+
+    int flowerSize = 5;
 
 private slots:
     void on_setup_clicked();
@@ -38,6 +41,9 @@ private:
     void setup_map();
     void setup_flowers();
     void update_map();
+//    void draw_flower(QImage& image, const flower& flowers);
+    void draw_flower(QImage& image);
+    void update_map_image();
 };
 
 #endif // MAINWINDOW_H
