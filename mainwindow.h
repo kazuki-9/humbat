@@ -18,7 +18,7 @@ public:
     MainWindow(QWidget *parent = nullptr); // Declaration of the constructor
     ~MainWindow(); // Declaration of the destructor
 
-    int flowerSize = 5;
+    int flower_size = 4;
 
 private slots:
     void on_setup_clicked();
@@ -28,9 +28,11 @@ private:
     Ui::MainWindow *ui;
 
     // Parameters
-    const unsigned x_map = 300;
-    const unsigned y_map = 300;
+    const int x_map = 300;
+    const int y_map = 300;
     const unsigned n_flowers = 10;
+    std::chrono::steady_clock::time_point startTime;
+    int maxSimulationTimeInSeconds; // Maximum simulation time in seconds
 
     // QImage
     QImage image;
@@ -41,9 +43,9 @@ private:
     void setup_map();
     void setup_flowers();
     void update_map();
-//    void draw_flower(QImage& image, const flower& flowers);
     void draw_flower(QImage& image, const flower& f);
     void update_map_image();
+    bool stopConditionMet();
 };
 
 #endif // MAINWINDOW_H
