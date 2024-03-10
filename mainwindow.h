@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "flower.h"
+#include "qlineseries.h"
 #include "ui_mainwindow.h"
 #include <QGraphicsScene>
 #include <QMainWindow>
@@ -26,6 +27,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QLineSeries *series;
+    QChart *chart;
 
     // Parameters
     const int x_map = 300;
@@ -47,6 +50,8 @@ private:
     void update_map_image();
     bool stopConditionMet();
     void plotScaledImage();
+
+    void draw_chart();
 };
 
 #endif // MAINWINDOW_H

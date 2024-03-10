@@ -35,6 +35,23 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up the UI
     ui->setupUi(this);
     setup_map();
+
+     // Setting up the chart for plotting
+    chart = new QChart();
+    series = new QLineSeries();
+    series->setColor(Qt::red); // default color: blue
+    series->setName("Flowers");
+
+   chart->addSeries(series);  // a chart can have more than one series
+
+    chart->createDefaultAxes();
+
+    chart->axisX()->setTitleText("Time [t]");
+    chart->axisY()->setTitleText("Corolla size [mm]");
+    chart->setTitle("<H2>Flower evolution model</H2>");
+
+
+    ui->my_chart->setChart(chart);
 }
 
 bool MainWindow::stopConditionMet() {
@@ -89,7 +106,7 @@ void MainWindow::setup_flowers(){
         flowers.emplace_back(std::vector<int>{}, 0, 20, i);  // variables are xy_cor, age, corolla_size, id
         flowers[i].xy_cor = {uni_x(rng), uni_y(rng)};          // assign random x and y coordinates
         flowers[i].corolla_size = uni_c(rng);                   // update flower parameters
-        flowers[i].id = i;                                        // assign flower id
+        flowers[i].id = i + 1;                                        // assign flower id
         flower_ids.push_back(i);
         //        cout << '('<<flowers[i].xy_cor[0] <<','<< flowers[i].xy_cor[1] <<')'<< ", corolla size " << flowers[i].corolla_size << endl;
         //        cout <<','<< flowers[i].age <<')'<< ", corolla size " << flowers[i].corolla_size << endl;
@@ -147,20 +164,20 @@ void MainWindow::update_map() {
             // Renew flower parameters if needed
             if (flower.age > 100) {
                 flower.age = 0;
-                if (flower.corolla_size<= 60) {
+                if (flower.corolla_size<= min(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())) {
+                    flower.corolla_size -= uni_c_change(rng);
+                } else if (flower.corolla_size > max(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())){
                     flower.corolla_size += uni_c_change(rng);
-                } else if (flower.corolla_size > 70){
-                    flower.corolla_size += uni_c_change(rng);
-                } else if (flower.corolla_size > 60 && flower.corolla_size<= 70) {
+                } else if (flower.corolla_size > ui->spinBox_bats_range_min->value() && flower.corolla_size<= ui->spinBox_hums_range_max->value()) {
 
-                    // competition
+                    // Competition
                     if (randomFloat_0_1(rng) > 0.5) {
                         flower.corolla_size += uni_c_change(rng);
                     } else {
                         flower.corolla_size -= uni_c_change(rng);
                     }
                 }
-                // make sure corolla size is within the range
+                // Ensure corolla size is within the range
                 if (flower.corolla_size < 30) {
                     flower.corolla_size = 30;
                 } else if (flower.corolla_size > 100) {
@@ -182,6 +199,10 @@ void MainWindow::update_map() {
         }
         // Update the map with the current state of flowers
         update_map_image();
+        if (iterationCount % 100 == 0)
+        {
+            draw_chart();
+        }
         //        if (stopConditionMet()) {
         //            break; // Exit the loop if the condition is met
         //        }
@@ -189,6 +210,85 @@ void MainWindow::update_map() {
         //        std::this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
     }
 }
+
+
+std::vector<std::vector<int>> series_corolla_size;
+void MainWindow::draw_chart() {
+
+    int xMin = 0;
+    int xMax = 2000;
+    int yMin = 30;
+    int yMax = 100;
+
+    // Clear the series before adding new data
+    series->clear();
+
+    for (int i = 0 ; i < n_flowers; i++) {
+        std::vector<int>& corolla_size_data = series_corolla_size[i];
+
+        // Add corolla size data for each time step
+        for (int timestep = 0; timestep < corolla_size_data.size(); timestep++) {
+            int corolla_size = corolla_size_data[timestep];
+            // Append data point to the series for the current time step
+            series->append(timestep, corolla_size);
+        }
+        chart->axisX()->setRange(xMin, xMax); // xMin, xMax are just placeholders
+        chart->axisY()->setRange(yMin, yMax); // yMin, yMax are just placeholders
+
+        // series->clear(); // deletes all data points
+        //    series->append(xMin, series_corolla_size); // adds a data point; xValue could be a time step and yValue the population size
+    }
+}
+
+// ------------------------------------------------
+//        std::vector<int> corollaSizeSnapshot;
+//        for (const auto& flower : flowers) {
+//            corollaSizeSnapshot.push_back(flower.corolla_size);
+//        }
+
+//        series_corolla_size.push_back(corollaSizeSnapshot);
+// ------------------------------------------------
+
+    //    // Create a chart
+    //    QChart *chart = new QChart();
+    //    chart->setTitle("Flower Corolla Size");
+    //    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    //    // Create a bar series
+    //    QBarSeries *series = new QBarSeries();
+    //    series->setLabelsVisible(true);
+
+    //    // Create the categories
+    //    QStringList categories;
+    //    for (auto& flower : flowers) {
+    //        categories << QString::number(flower.id);
+    //    }
+
+    //    // Create the data
+    //    QBarSet *set = new QBarSet("Corolla Size");
+    //    for (auto& flower : flowers) {
+    //        *set << flower.corolla_size;
+    //    }
+
+    //    // Add the data to the series
+    //    series->append(set);
+
+    //    // Add the series to the chart
+    //    chart->addSeries(series);
+
+    //    // Set the categories on the horizontal axis
+    //    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    //    axis->append(categories);
+    //    chart->createDefaultAxes();
+    //    chart->setAxisX(axis, series);
+
+    //    // Create a chart view
+    //    QChartView *chartView = new QChartView(chart);
+    //    chartView->setRenderHint(QPainter::Antialiasing);
+
+    //    // Set the chart view as the central widget
+    //    ui->chart->setCentralWidget(chartView);
+
 
 // -------------------- for death start -----------------------------------
 //for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
@@ -250,7 +350,7 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
                 // Check if the current pixel is within the circle
                 if (dx * dx + dy * dy <= pow(flower_size, 2)) {
                     // Set the color of the pixel to represent the flower
-                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color
+                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color. The bigger the corolla size, the brighter red the color
                 }
             }
         }
