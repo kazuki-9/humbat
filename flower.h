@@ -14,17 +14,16 @@ public:
         std::vector<int> xy_cor,
         int age, // T = male, F = female
         int corolla_size, // in mm
-        double death_rate, // per year
+//        double death_rate, // per year
         int id
         );
 
     std::vector<int> xy_cor;
     int age; // T = male, F = female
     int corolla_size; // in mm
-    double death_rate; // per year
-    QRgb color;
+//    double death_rate; // per year
     int id;
-
+    QRgb color;
 //    bool is_alive;
 
     bool operator==(const flower& other) const;

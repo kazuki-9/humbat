@@ -46,6 +46,7 @@ private:
     void draw_flower(QImage& image, const flower& f);
     void update_map_image();
     bool stopConditionMet();
+    void plotScaledImage();
 };
 
 #endif // MAINWINDOW_H
