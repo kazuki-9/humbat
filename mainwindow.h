@@ -89,6 +89,8 @@ private:
     void make_series();
     void draw_chart();
 
+    void calculate_average();
+
     bool unit_test();
 };
 
