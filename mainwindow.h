@@ -27,7 +27,27 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    std::vector<QLineSeries*> series_list;
+    QLineSeries *series_1; // represents storage for the data points
+    QLineSeries *series_2;
+    QLineSeries *series_3;
+    QLineSeries *series_4;
+    QLineSeries *series_5;
+    QLineSeries *series_6;
+    QLineSeries *series_7;
+    QLineSeries *series_8;
+    QLineSeries *series_9;
+    QLineSeries *series_10;
+    QLineSeries *series_11;
+    QLineSeries *series_12;
+    QLineSeries *series_13;
+    QLineSeries *series_14;
+    QLineSeries *series_15;
+    QLineSeries *series_16;
+    QLineSeries *series_17;
+    QLineSeries *series_18;
+    QLineSeries *series_19;
+    QLineSeries *series_20;
+
     QChart *chart;
 
     // Parameters

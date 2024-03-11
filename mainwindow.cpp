@@ -25,6 +25,7 @@ bool test_add() {
     return true;
 }
 
+vector<QLineSeries*> series_list;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -37,17 +38,93 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setup_map(); // set up the map for the first time without any flowers
 
-     // Setting up the chart for plotting
-    chart = new QChart();    
+    setup_chart();
+
+}
+
+MainWindow::~MainWindow() {  delete ui; } // Destructor definition
+
+void MainWindow::setup_chart() {
+    // Setting up the chart for plotting
+    chart = new QChart();
+
+    series_1 = new QLineSeries();
+//    series_2 = new QLineSeries();
+//    series_3 = new QLineSeries();
+//    series_4 = new QLineSeries();
+//    series_5 = new QLineSeries();
+//    series_6 = new QLineSeries();
+//    series_7 = new QLineSeries();
+//    series_8 = new QLineSeries();
+//    series_10 = new QLineSeries();
+//    series_11 = new QLineSeries();
+//    series_12 = new QLineSeries();
+//    series_13 = new QLineSeries();
+//    series_14 = new QLineSeries();
+//    series_15 = new QLineSeries();
+//    series_16 = new QLineSeries();
+//    series_17 = new QLineSeries();
+//    series_18 = new QLineSeries();
+//    series_19 = new QLineSeries();
+//    series_20 = new QLineSeries();
+
+    series_1->setColor(QColor(255, 1* 12, 0)); // shade the color depending on the id
+//    series_2->setColor(QColor(255, 2* 12, 0));
+//    series_3->setColor(QColor(255, 3* 12, 0));
+//    series_4->setColor(QColor(255, 4* 12, 0));
+//    series_5->setColor(QColor(255, 5* 12, 0));
+//    series_6->setColor(QColor(255, 6* 12, 0));
+//    series_7->setColor(QColor(255, 7* 12, 0));
+//    series_8->setColor(QColor(255, 8* 12, 0));
+//    series_9->setColor(QColor(255, 9* 12, 0));
+//    series_10->setColor(QColor(255, 10* 12, 0));
+//    series_11->setColor(QColor(255, 11* 12, 0));
+//    series_12->setColor(QColor(255, 12* 12, 0));
+//    series_13->setColor(QColor(255, 13* 12, 0));
+//    series_14->setColor(QColor(255, 14* 12, 0));
+//    series_15->setColor(QColor(255, 15* 12, 0));
+//    series_16->setColor(QColor(255, 16* 12, 0));
+//    series_17->setColor(QColor(255, 17* 12, 0));
+//    series_18->setColor(QColor(255, 18* 12, 0));
+//    series_19->setColor(QColor(255, 19* 12, 0));
+//    series_20->setColor(QColor(255, 20* 12, 0));
+
+    chart->addSeries(series_1);
+//    chart->addSeries(series_2);
+//    chart->addSeries(series_3);
+//    chart->addSeries(series_4);
+//    chart->addSeries(series_5);
+//    chart->addSeries(series_6);
+//    chart->addSeries(series_7);
+//    chart->addSeries(series_8);
+//    chart->addSeries(series_9);
+//    chart->addSeries(series_10);
+//    chart->addSeries(series_11);
+//    chart->addSeries(series_12);
+//    chart->addSeries(series_13);
+//    chart->addSeries(series_14);
+//    chart->addSeries(series_15);
+//    chart->addSeries(series_16);
+//    chart->addSeries(series_17);
+//    chart->addSeries(series_18);
+//    chart->addSeries(series_19);
+//    chart->addSeries(series_20);
+
     chart->createDefaultAxes();
     chart->axisX()->setTitleText("Time [t]");
     chart->axisY()->setTitleText("Corolla size [mm]");
     chart->setTitle("<H2>Flower evolution model</H2>");
 
+    int x_min = 0;
+    int x_max = 200;
+    int y_min = 30;
+    int y_max = 100;
+    // Set the range
+    chart->axisX()->setRange(x_min, x_max);
+    chart->axisY()->setRange(y_min, y_max);
+
     ui->my_chart->setChart(chart);
 }
-
-MainWindow::~MainWindow() {  delete ui; } // Destructor definition
 
 //bool MainWindow::stopConditionMet() { // not used atm
 //    // Get the current time
@@ -85,7 +162,7 @@ void MainWindow::on_setup_clicked()
     setup_flowers();// with flowers
     // Clear the series before adding new data
 //    series->clear();
-    setup_chart();
+//    setup_chart();
 }
 
 vector<flower> flowers;
@@ -128,27 +205,20 @@ void MainWindow::on_start_clicked()
     update_map();
 }
 
-void MainWindow::setup_chart() {
-    int x_min = 0;
-    int x_max = 1000;
-    int y_min = 30;
-    int y_max = 100;
-    // Set the range
-    chart->axisX()->setRange(x_min, x_max);
-    chart->axisY()->setRange(y_min, y_max);
-}
+
 
 //      void simulateTime(std::vector<flower>& flowers) {
 uniform_int_distribution<int> uni_d(-3, 3); // Randomly select the direction of movement
 uniform_int_distribution<int> uni_c_change(0, 1); // Randomly select the degree of change in corolla size
 
 uniform_real_distribution<float> randomFloat_0_1;
-vector<QLineSeries*> series_list;
+
+//vector<QLineSeries*> series_list;
 
 void MainWindow::update_map() {
 
     // flower generation
-    int maxIterations = 2000; // number of iterations till stop
+    int maxIterations = 500; // number of iterations till stop
     for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
         //    while (!stopConditionMet()) {
         //        // Check if the maximum simulation time has been reached
@@ -158,6 +228,9 @@ void MainWindow::update_map() {
         //            break; // Exit the loop if the maximum simulation time is reached
         //        }
 
+
+        // Initialize series_corolla_size with the same size as the number of flowers
+        series_list.resize(flowers.size());
         // Update the parameters of existing flowers
         for (auto& flower : flowers) {
             // Simulate aging
@@ -194,24 +267,30 @@ void MainWindow::update_map() {
                 new_y = std::max(flower_size, std::min(new_y, y_map - flower_size - 1));
 
                 flower.xy_cor = {new_x, new_y}; // and move
+//                for (size_t i = 0 ; i < flowers.size(); i++) {
+                    //        std::vector<int>& corolla_size_data = series_corolla_size[i];
+                    //                series_corolla_size.push_back(flowers[i].corolla_size);
 
+                    //            }
+                    series_1->setColor(QColor(255, flowers[0].id * 12, 0));
+                    series_1->setName("Flower " + QString::number(flowers[0].id));
+
+                    series_1->append(flowers[0].generation, flowers[0].corolla_size);
+                    chart->addSeries(series_1);
+//                }
             }
-            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
+//            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
 
-            // Initialize series_corolla_size with the same size as the number of flowers
-            series_list.resize(flowers.size());
-
-            for (size_t i = 0 ; i < flowers.size(); i++) {
+//            for (size_t i = 0 ; i < flowers.size(); i++) {
                 //        std::vector<int>& corolla_size_data = series_corolla_size[i];
                 //                series_corolla_size.push_back(flowers[i].corolla_size);
-
                 //            }
-                series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
-                series_list[i]->setName("Flower" + QString::number(flowers[i].id));
+//                series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
+//                series_list[i]->setName("Flower" + QString::number(flowers[i].id));
 
-                series_list[i]->append(flowers[i].generation, flowers[i].corolla_size);
-                chart->addSeries(series_list[i]);
-            }
+//                series_list[i]->append(flowers[i].generation, flowers[i].corolla_size);
+//                chart->addSeries(series_list[i]);
+//            }
 //            for (size_t i = 0 ; i < flowers.size(); i++) {
 //                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
 //                series_corolla_size.push_back(flowers[i].corolla_size);
@@ -219,14 +298,7 @@ void MainWindow::update_map() {
 //            }
         // Update the map with the current state of flowers
         update_map_image();
-
-//        if (iterationCount % 100 == 0)
-//        {
-
-
-//        }
-//        make_series();
-        draw_chart();
+//        draw_chart();
         //        if (stopConditionMet()) {
         //            break; // Exit the loop if the condition is met
         //        }
@@ -237,28 +309,8 @@ void MainWindow::update_map() {
 }
 
 
-
-void MainWindow::make_series() {
-
-//    for (size_t i = 0 ; i < flowers.size(); i++) {
-//        // Create a new QLineSeries for each flower
-//        series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
-//        series_list[i]->setName("Flower" + QString::number(flowers[i].id));
-
-//        series_list[i]->append(timestep, series_corolla_size[timestep]);
-//        chart->addSeries(series);
-//        // Add corolla size data for each time step
-//        for (int timestep = 0; timestep < series_corolla_size[i]; timestep++) {
-//                // Append data point to the series for the current time step
-//                // Assuming each iteration represents 100 time steps
-//        }
-//    }
-
-
-}
-
-void MainWindow::draw_chart() {
-}
+//void MainWindow::draw_chart() {
+//}
 
 void MainWindow::update_map_image() {
     // Clear the existing image
