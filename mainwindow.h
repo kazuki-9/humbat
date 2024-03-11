@@ -6,10 +6,13 @@
 #include "ui_mainwindow.h"
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <random>
 
 //#include <QtCharts>
 //#include <QLineSeries>
 //#include <QChart>
+
+using namespace std;
 
 class MainWindow : public QMainWindow
 {
@@ -27,6 +30,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    // Chart series
     QLineSeries *series_1; // represents storage for the data points
     QLineSeries *series_2;
     QLineSeries *series_3;
@@ -50,12 +55,21 @@ private:
 
     QChart *chart;
 
+    // Random number generator
+    random_device rd;     // Only used once to initialise (seed) engine
+
+    uniform_int_distribution<int> uni_x; // Guaranteed unbiased
+    uniform_int_distribution<int> uni_y;
+
+    uniform_int_distribution<int> uni_d; // Randomly select the direction of movement
+    uniform_int_distribution<int> uni_c_change; // Randomly select the degree of change in corolla size
+    uniform_real_distribution<float> randomFloat_0_1; // Generate random number between 0 and 1 for selection either by hummingbirds or bats
+    uniform_int_distribution<int> uni_c; // Randomly select the corolla size
+
     // Parameters
     const int x_map = 300;
     const int y_map = 300;
-    const unsigned n_flowers = 10;
-    std::chrono::steady_clock::time_point startTime;
-    int maxSimulationTimeInSeconds; // Maximum simulation time in seconds
+    const unsigned n_flowers = 0; // number of flowers, initialized with 0
 
     // QImage
     QImage image;
@@ -68,12 +82,16 @@ private:
     void update_map();
     void draw_flower(QImage& image, const flower& f);
     void update_map_image();
-    bool stopConditionMet();
-    void plotScaledImage();
 
     void setup_chart();
     void make_series();
     void draw_chart();
+
+    // currently not used
+    bool stopConditionMet();
+    void plotScaledImage();
+
+
 };
 
 #endif // MAINWINDOW_H

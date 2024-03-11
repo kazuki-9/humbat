@@ -9,8 +9,6 @@
 #include <iostream>
 #include <vector>
 #include <QGraphicsScene>
-#include <chrono>
-#include <thread>
 #include <algorithm>
 
 using namespace std;
@@ -25,21 +23,21 @@ bool test_add() {
     return true;
 }
 
-vector<QLineSeries*> series_list;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    // Initialize start time and maximum simulation time
-    startTime = std::chrono::steady_clock::now();
-    maxSimulationTimeInSeconds = 3; // Set the maximum simulation time to 60 seconds // not used atm
-
     // Set up the UI
     ui->setupUi(this);
     setup_map(); // set up the map for the first time without any flowers
 
-    setup_chart();
+    setup_chart(); // set up the chart for the first time without any flowers
 
+    uni_x = uniform_int_distribution<int> (flower_size, x_map -flower_size); // Randomly select the x coordinate
+    uni_y = uniform_int_distribution<int> (flower_size, y_map -flower_size); // Randomly select the y coordinate
+    uni_c = uniform_int_distribution<int> (30, 100); // Randomly select the corolla size
+    uni_d = uniform_int_distribution<int> (-3, 3); // Randomly select the direction of movement
+    uni_c_change = uniform_int_distribution<int> (0, 1); // Randomly select the degree of change in corolla size
 }
 
 MainWindow::~MainWindow() {  delete ui; } // Destructor definition
@@ -126,22 +124,8 @@ void MainWindow::setup_chart() {
     ui->my_chart->setChart(chart);
 }
 
-//bool MainWindow::stopConditionMet() { // not used atm
-//    // Get the current time
-//    auto currentTime = std::chrono::steady_clock::now();
-
-//    // Calculate the elapsed time since the simulation started
-//    auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-
-//    // Check if the elapsed time exceeds the maximum simulation time
-//    return (elapsedTime >= maxSimulationTimeInSeconds);
-//}
-
 random_device rd;     // Only used once to initialise (seed) engine
-mt19937 rng(rd());    // Random-number engine used (Mersenne-Twister in this case)
-uniform_int_distribution<int> uni_x(flower_size, x_map -flower_size); // Guaranteed unbiased
-uniform_int_distribution<int> uni_y(flower_size, y_map -flower_size);
-
+mt19937 rng(rd());   // random-number engine used (Mersenne-Twister in this case)
 
 void MainWindow::setup_map() {
     scene = new QGraphicsScene;
@@ -157,16 +141,17 @@ void MainWindow::setup_map() {
 
 void MainWindow::on_setup_clicked()
 {
+     //  chart->removeAllSeries(); whyyyyyyyyyyyyyyyyyyyyyyyyyyy
     scene->clear();
     setup_map();    // Renew the map
-    setup_flowers();// with flowers
+    setup_flowers();// , with flowers
+
     // Clear the series before adding new data
 //    series->clear();
 //    setup_chart();
 }
 
 vector<flower> flowers;
-uniform_int_distribution<int> uni_c(30, 100);
 
 void MainWindow::setup_flowers(){
     flowers.clear();
@@ -192,45 +177,25 @@ void MainWindow::setup_flowers(){
                 }
             }
         }
-        //        scene->clear();
-        //        scene->addPixmap(QPixmap::fromImage(image));
     }
     scene->clear();
     scene->addPixmap(QPixmap::fromImage(image));
 }
 
-
 void MainWindow::on_start_clicked()
 {
+    ui->start->setEnabled(false);
+    QCoreApplication::processEvents();
+
     update_map();
+    ui->start->setEnabled(true);
 }
-
-
-
-//      void simulateTime(std::vector<flower>& flowers) {
-uniform_int_distribution<int> uni_d(-3, 3); // Randomly select the direction of movement
-uniform_int_distribution<int> uni_c_change(0, 1); // Randomly select the degree of change in corolla size
-
-uniform_real_distribution<float> randomFloat_0_1;
-
-//vector<QLineSeries*> series_list;
 
 void MainWindow::update_map() {
 
     // flower generation
-    int maxIterations = 500; // number of iterations till stop
-    for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
-        //    while (!stopConditionMet()) {
-        //        // Check if the maximum simulation time has been reached
-        //        auto currentTime = std::chrono::steady_clock::now();
-        //        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-        //        if (elapsedTime >= maxSimulationTimeInSeconds) {
-        //            break; // Exit the loop if the maximum simulation time is reached
-        //        }
-
-
-        // Initialize series_corolla_size with the same size as the number of flowers
-        series_list.resize(flowers.size());
+    int max_iterations = 500; // number of iterations till stop
+    for (int iteration_count = 0; iteration_count < max_iterations; ++iteration_count) {
         // Update the parameters of existing flowers
         for (auto& flower : flowers) {
             // Simulate aging
@@ -267,50 +232,21 @@ void MainWindow::update_map() {
                 new_y = std::max(flower_size, std::min(new_y, y_map - flower_size - 1));
 
                 flower.xy_cor = {new_x, new_y}; // and move
-//                for (size_t i = 0 ; i < flowers.size(); i++) {
-                    //        std::vector<int>& corolla_size_data = series_corolla_size[i];
-                    //                series_corolla_size.push_back(flowers[i].corolla_size);
+                series_1->setColor(QColor(255, flowers[0].id * 12, 0));
+                series_1->setName("Flower " + QString::number(flowers[0].id));
 
-                    //            }
-                    series_1->setColor(QColor(255, flowers[0].id * 12, 0));
-                    series_1->setName("Flower " + QString::number(flowers[0].id));
+                series_1->append(flowers[0].generation, flowers[0].corolla_size);
 
-                    series_1->append(flowers[0].generation, flowers[0].corolla_size);
-                    chart->addSeries(series_1);
-//                }
             }
-//            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
+            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
 
-//            for (size_t i = 0 ; i < flowers.size(); i++) {
-                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
-                //                series_corolla_size.push_back(flowers[i].corolla_size);
-                //            }
-//                series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
-//                series_list[i]->setName("Flower" + QString::number(flowers[i].id));
-
-//                series_list[i]->append(flowers[i].generation, flowers[i].corolla_size);
-//                chart->addSeries(series_list[i]);
-//            }
-//            for (size_t i = 0 ; i < flowers.size(); i++) {
-//                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
-//                series_corolla_size.push_back(flowers[i].corolla_size);
-
-//            }
         // Update the map with the current state of flowers
         update_map_image();
-//        draw_chart();
-        //        if (stopConditionMet()) {
-        //            break; // Exit the loop if the condition is met
-        //        }
-        // Sleep if needed
-        //        std::this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
+        }
     }
-}
+    chart->addSeries(series_1);
 }
 
-
-//void MainWindow::draw_chart() {
-//}
 
 void MainWindow::update_map_image() {
     // Clear the existing image
@@ -327,7 +263,6 @@ void MainWindow::update_map_image() {
     scene->addPixmap(QPixmap::fromImage(image));
 }
 
-//void MainWindow::draw_flower(QImage& image, const flower& flowers) {
 void MainWindow::draw_flower(QImage& image, const flower& flower) {
     // draw a flower onto the image
     for (const auto& flower : flowers) {
@@ -402,7 +337,7 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
 
 
 // -------------------- for death start -----------------------------------
-//for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
+//for (int iteration_count = 0; iteration_count < max_iterations; ++iteration_count) {
 //        for (auto it = flowers.begin(); it != flowers.end(); ) {
 //            auto& flower = *it;
 
@@ -442,10 +377,10 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
 
 //void MainWindow::update_map() {
 //     int flower_size = 5;
-//        int maxIterations = 1000;
+//        int max_iterations = 1000;
 
 //        // ---------------------3------------------------
-//        for (int iterationCount = 0; iterationCount < maxIterations; iterationCount++) {
+//        for (int iteration_count = 0; iteration_count < max_iterations; iteration_count++) {
 //            // Iterate over the flowers vector
 //            auto it = flowers.begin();
 //            while (it != flowers.end()) {
@@ -479,9 +414,9 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
 //}
 
 // -------------------------2----------------------
-//    int maxIterations = 100;
+//    int max_iterations = 100;
 //     int flower_size = 5;
-//        for (int iterationCount = 0; iterationCount < maxIterations; iterationCount++) {
+//        for (int iteration_count = 0; iteration_count < max_iterations; iteration_count++) {
 //            for (auto it = flowers.begin(); it != flowers.end(); ) {
 //                // Simulate death
 //                if (it->age > 100) {
@@ -513,13 +448,13 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
 //        }
 
 /* --------------------------1---------------------
-    int iterationCount = 0;
-    int maxIterations = 1000;
+    int iteration_count = 0;
+    int max_iterations = 1000;
 
-    while (iterationCount < maxIterations) {
+    while (iteration_count < max_iterations) {
 
         for (auto& flower : flowers) {
-//            for (int i = iterationCount; i < maxIterations; i++) {
+//            for (int i = iteration_count; i < max_iterations; i++) {
                 // Simulate death
                 if (flower.age > 100) {
                     // Remove the flower from the simulation
@@ -539,13 +474,13 @@ void MainWindow::draw_flower(QImage& image, const flower& flower) {
 //            // or, to add an element at the front...
 //            flowers.insert(flowers.begin() + 0, std::vector<int>{}, true, 20, 0.1, i);
 //            // Increment the iteration counter
-            iterationCount++;
+            iteration_count++;
 
 //            // Check if the desired number of iterations is reached
 
 //            this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
         }
-//            if (iterationCount >= maxIterations) {
+//            if (iteration_count >= max_iterations) {
 //                break; // Exit the loop
         } */
 //    }

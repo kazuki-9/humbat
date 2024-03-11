@@ -10,6 +10,9 @@
 
 class flower {
 public:
+
+    int flower_size = 4;
+
     flower(
         std::vector<int> xy_cor,
         int time_elapsed, // for renewing the generation
