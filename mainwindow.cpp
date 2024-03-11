@@ -13,15 +13,11 @@
 
 using namespace std;
 
-const int x_map = 300;
-const int y_map = 300;
-int flower_size = 4;
+//const int x_map = 300;
+//const int y_map = 300;
+//int flower_size = 4;
 // int y_map = y_map; // somehow this doesn't work and makes a super large number
 
-
-bool test_add() {
-    return true;
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -35,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     uni_x = uniform_int_distribution<int> (flower_size, x_map -flower_size); // Randomly select the x coordinate
     uni_y = uniform_int_distribution<int> (flower_size, y_map -flower_size); // Randomly select the y coordinate
-    uni_c = uniform_int_distribution<int> (30, 100); // Randomly select the corolla size
+    uni_c = uniform_int_distribution<int> (min_corolla_size, max_corolla_size); // Randomly select the corolla size
     uni_d = uniform_int_distribution<int> (-3, 3); // Randomly select the direction of movement
     uni_c_change = uniform_int_distribution<int> (0, 1); // Randomly select the degree of change in corolla size
 }
@@ -66,7 +62,7 @@ void MainWindow::setup_chart() {
 //    series_19 = new QLineSeries();
 //    series_20 = new QLineSeries();
 
-    series_1->setColor(QColor(255, 1* 12, 0)); // shade the color depending on the id
+//    series_1->setColor(QColor(255, 1* 12, 0)); // shade the color depending on the id
 //    series_2->setColor(QColor(255, 2* 12, 0));
 //    series_3->setColor(QColor(255, 3* 12, 0));
 //    series_4->setColor(QColor(255, 4* 12, 0));
@@ -109,14 +105,14 @@ void MainWindow::setup_chart() {
 //    chart->addSeries(series_20);
 
     chart->createDefaultAxes();
-    chart->axisX()->setTitleText("Time [t]");
+    chart->axisX()->setTitleText("Time [generations]");
     chart->axisY()->setTitleText("Corolla size [mm]");
     chart->setTitle("<H2>Flower evolution model</H2>");
 
     int x_min = 0;
-    int x_max = 200;
-    int y_min = 30;
-    int y_max = 100;
+    int x_max = 200; // plot only until 200 generations later
+    int y_min = min_corolla_size;
+    int y_max = max_corolla_size;
     // Set the range
     chart->axisX()->setRange(x_min, x_max);
     chart->axisY()->setRange(y_min, y_max);
@@ -133,7 +129,7 @@ void MainWindow::setup_map() {
     ui->map->resize(x_map, y_map); // resize the map
 
     image = QImage(x_map, y_map, QImage::Format_ARGB32); //@ Format_ARGB32 is a 32-bit RGB format
-    image.fill(QColor(Qt::green).lighter(130)); // Adjust the alpha value to make it lighter
+    image.fill(QColor(Qt::green).lighter(130)); // Adjust the alpha value to make it light green
 
     scene->addPixmap(QPixmap::fromImage(image));
 }
@@ -160,7 +156,7 @@ void MainWindow::setup_flowers(){
     // Draw flowers randomly in the patch
     for (unsigned i = 0; i < n_flowers; i++)
     {
-        flowers.emplace_back(std::vector<int>{}, 0, 1, 20, i);  // variables are xy_cor, age, corolla_size, id
+        flowers.emplace_back(std::vector<int>{}, 0, 0, 0, i);  // variables are xy_cor, time_elapsed, generation, corolla_size, id
         flowers[i].xy_cor = {uni_x(rng), uni_y(rng)};          // assign random x and y coordinates
         flowers[i].corolla_size = uni_c(rng);                   // update flower parameters
         flowers[i].id = i + 1;                                        // assign flower id
@@ -173,7 +169,7 @@ void MainWindow::setup_flowers(){
                 // Check if the current pixel is within the circle
                 if (dx * dx + dy * dy <= pow(flower_size, 2)) {
                     // Set the color of the pixel to represent the flower
-                    image.setPixel(flowers[i].xy_cor[0] + dx, flowers[i].xy_cor[1] + dy, qRgb(255* flowers[i].corolla_size /100, 0, 0)); // set pixel color
+                    image.setPixel(flowers[i].xy_cor[0] + dx, flowers[i].xy_cor[1] + dy, qRgb(255* flowers[i].corolla_size / max_corolla_size, 0, 0)); // set pixel color
                 }
             }
         }
@@ -185,14 +181,14 @@ void MainWindow::setup_flowers(){
 void MainWindow::on_start_clicked()
 {
     ui->start->setEnabled(false);
-    QCoreApplication::processEvents();
-
+    QCoreApplication::processEvents(); // make sure to update the UI
     update_map();
+    unit_test();
     ui->start->setEnabled(true);
+
 }
 
 void MainWindow::update_map() {
-
     // flower generation
     int max_iterations = 500; // number of iterations till stop
     for (int iteration_count = 0; iteration_count < max_iterations; ++iteration_count) {
@@ -208,8 +204,7 @@ void MainWindow::update_map() {
                 } else if (flower.corolla_size > max(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())){
                     flower.corolla_size += uni_c_change(rng);
                 } else if (flower.corolla_size > ui->spinBox_bats_range_min->value() && flower.corolla_size<= ui->spinBox_hums_range_max->value()) {
-
-                    // Competition
+                    // Competition between bats and hummingbirds
                     if (randomFloat_0_1(rng) > 0.5) {
                         flower.corolla_size += uni_c_change(rng);
                     } else {
@@ -217,10 +212,10 @@ void MainWindow::update_map() {
                     }
                 }
                 // Ensure corolla size is within the range
-                if (flower.corolla_size < 30) {
-                    flower.corolla_size = 30;
-                } else if (flower.corolla_size > 100) {
-                    flower.corolla_size = 100;
+                if (flower.corolla_size < min_corolla_size) {
+                    flower.corolla_size = min_corolla_size;
+                } else if (flower.corolla_size > max_corolla_size) {
+                    flower.corolla_size = max_corolla_size;
                 }
 
                 // Simulate movement
@@ -231,10 +226,11 @@ void MainWindow::update_map() {
                 new_x = std::max(flower_size, std::min(new_x, x_map - flower_size - 1)); //Chat GPT
                 new_y = std::max(flower_size, std::min(new_y, y_map - flower_size - 1));
 
-                flower.xy_cor = {new_x, new_y}; // and move
-                series_1->setColor(QColor(255, flowers[0].id * 12, 0));
-                series_1->setName("Flower " + QString::number(flowers[0].id));
+                flower.xy_cor = {new_x, new_y}; // Assign new n-y coordinates for move appearance
 
+                // Fill the series with the new data
+                series_1->setColor(QColor(255, flowers[0].id * 12, 0));
+                series_1->setName("F " + QString::number(flowers[0].id));
                 series_1->append(flowers[0].generation, flowers[0].corolla_size);
 
             }
@@ -264,19 +260,29 @@ void MainWindow::update_map_image() {
 }
 
 void MainWindow::draw_flower(QImage& image, const flower& flower) {
-    // draw a flower onto the image
     for (const auto& flower : flowers) {
-        // Redraw the flower if it's alive
+        // Redraw the flower for the next generations
         for (int dx = -flower_size; dx <= flower_size; dx++) {
             for (int dy = -flower_size; dy <= flower_size; dy++) {
                 // Check if the current pixel is within the circle
                 if (dx * dx + dy * dy <= pow(flower_size, 2)) {
                     // Set the color of the pixel to represent the flower
-                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color. The bigger the corolla size, the brighter red the color
+                    // The bigger the corolla size, the brighter red the color is.
+                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size / max_corolla_size, 0, 0));
                 }
             }
         }
     }
+}
+
+bool MainWindow::unit_test() { // Unit test
+    int result1 = flowers[0].corolla_size; // index [0], or any arbitrary flower
+    if (result1 > max_corolla_size || result1 < min_corolla_size) {
+        cout << "Unit test failed :(" << endl;
+        return false;
+    }
+    cout << "Unit test cleared :)" << endl;
+    return true;
 }
 
 // ------------scrap -------------------------------

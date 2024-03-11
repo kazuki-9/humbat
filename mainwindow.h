@@ -67,9 +67,11 @@ private:
     uniform_int_distribution<int> uni_c; // Randomly select the corolla size
 
     // Parameters
-    const int x_map = 300;
+    const int x_map = 300; // size of the map in x-y direction
     const int y_map = 300;
     const unsigned n_flowers = 0; // number of flowers, initialized with 0
+    const int min_corolla_size = 30;
+    const int max_corolla_size = 100;
 
     // QImage
     QImage image;
@@ -87,11 +89,7 @@ private:
     void make_series();
     void draw_chart();
 
-    // currently not used
-    bool stopConditionMet();
-    void plotScaledImage();
-
-
+    bool unit_test();
 };
 
 #endif // MAINWINDOW_H
