@@ -14,7 +14,7 @@ public:
         std::vector<int> xy_cor,
         int time_elapsed, // for renewing the generation
         int generation, // for renewing the variables
-        int corolla_size, // in mm
+        int corolla_size, // in mm^2
         int id
         );
 

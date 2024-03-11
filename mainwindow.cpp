@@ -98,7 +98,7 @@ void MainWindow::setup_flowers(){
     // Draw flowers randomly in the patch
     for (unsigned i = 0; i < n_flowers; i++)
     {
-        flowers.emplace_back(std::vector<int>{}, 0, 0, 20, i);  // variables are xy_cor, age, corolla_size, id
+        flowers.emplace_back(std::vector<int>{}, 0, 1, 20, i);  // variables are xy_cor, age, corolla_size, id
         flowers[i].xy_cor = {uni_x(rng), uni_y(rng)};          // assign random x and y coordinates
         flowers[i].corolla_size = uni_c(rng);                   // update flower parameters
         flowers[i].id = i + 1;                                        // assign flower id
@@ -142,11 +142,13 @@ void MainWindow::setup_chart() {
 uniform_int_distribution<int> uni_d(-3, 3); // Randomly select the direction of movement
 uniform_int_distribution<int> uni_c_change(0, 1); // Randomly select the degree of change in corolla size
 
-std::uniform_real_distribution<float> randomFloat_0_1;
-std::vector<int> series_corolla_size;
+uniform_real_distribution<float> randomFloat_0_1;
+vector<QLineSeries*> series_list;
 
 void MainWindow::update_map() {
-    int maxIterations = 2000;
+
+    // flower generation
+    int maxIterations = 2000; // number of iterations till stop
     for (int iterationCount = 0; iterationCount < maxIterations; ++iterationCount) {
         //    while (!stopConditionMet()) {
         //        // Check if the maximum simulation time has been reached
@@ -191,26 +193,40 @@ void MainWindow::update_map() {
                 new_x = std::max(flower_size, std::min(new_x, x_map - flower_size - 1)); //Chat GPT
                 new_y = std::max(flower_size, std::min(new_y, y_map - flower_size - 1));
 
-                flower.xy_cor = {new_x, new_y};
+                flower.xy_cor = {new_x, new_y}; // and move
 
             }
             cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
-        }
-        // Update the map with the current state of flowers
-        update_map_image();
 
+            // Initialize series_corolla_size with the same size as the number of flowers
+            series_list.resize(flowers.size());
 
-//        if (iterationCount % 100 == 0)
-//        {
-//            // Initialize series_corolla_size with the same size as the number of flowers
-//            series_corolla_size.resize(flowers.size());
+            for (size_t i = 0 ; i < flowers.size(); i++) {
+                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
+                //                series_corolla_size.push_back(flowers[i].corolla_size);
 
+                //            }
+                series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
+                series_list[i]->setName("Flower" + QString::number(flowers[i].id));
+
+                series_list[i]->append(flowers[i].generation, flowers[i].corolla_size);
+                chart->addSeries(series_list[i]);
+            }
 //            for (size_t i = 0 ; i < flowers.size(); i++) {
 //                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
 //                series_corolla_size.push_back(flowers[i].corolla_size);
 
+//            }
+        // Update the map with the current state of flowers
+        update_map_image();
+
+//        if (iterationCount % 100 == 0)
+//        {
+
+
 //        }
-            draw_chart();
+//        make_series();
+        draw_chart();
         //        if (stopConditionMet()) {
         //            break; // Exit the loop if the condition is met
         //        }
@@ -218,36 +234,70 @@ void MainWindow::update_map() {
         //        std::this_thread::sleep_for(std::chrono::milliseconds(800)); // Sleep for 0.8 seconds
     }
 }
+}
 
 
 
-void MainWindow::make_series(){
+void MainWindow::make_series() {
 
+//    for (size_t i = 0 ; i < flowers.size(); i++) {
+//        // Create a new QLineSeries for each flower
+//        series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
+//        series_list[i]->setName("Flower" + QString::number(flowers[i].id));
 
-//for (size_t i = 0 ; i < flowers.size(); i++) {
-//    // Create a new QLineSeries for each flower
-//            series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
-//            series_list[i]->setName("Flower" + QString::number(flowers[i].id));
-
-//            series_list[i]->append(timestep, series_corolla_size[timestep]);
-//            chart->addSeries(series);
-//    // Add corolla size data for each time step
-//    for (int timestep = 0; timestep < series_corolla_size[i]; timestep++) {
-//            // Append data point to the series for the current time step
-//            // Assuming each iteration represents 100 time steps
+//        series_list[i]->append(timestep, series_corolla_size[timestep]);
+//        chart->addSeries(series);
+//        // Add corolla size data for each time step
+//        for (int timestep = 0; timestep < series_corolla_size[i]; timestep++) {
+//                // Append data point to the series for the current time step
+//                // Assuming each iteration represents 100 time steps
+//        }
 //    }
-//}
 
 
 }
 
 void MainWindow::draw_chart() {
+}
 
+void MainWindow::update_map_image() {
+    // Clear the existing image
+    image.fill(QColor(Qt::green).lighter(130));
+
+    // Draw all the flowers onto the image
+    for (const auto& flower : flowers) {
+        //        draw_flower(image, flower);
+        draw_flower(image, flower);
+    }
+
+    // Update the scene with the new image
+    scene->clear();
+    scene->addPixmap(QPixmap::fromImage(image));
+}
+
+//void MainWindow::draw_flower(QImage& image, const flower& flowers) {
+void MainWindow::draw_flower(QImage& image, const flower& flower) {
+    // draw a flower onto the image
+    for (const auto& flower : flowers) {
+        // Redraw the flower if it's alive
+        for (int dx = -flower_size; dx <= flower_size; dx++) {
+            for (int dy = -flower_size; dy <= flower_size; dy++) {
+                // Check if the current pixel is within the circle
+                if (dx * dx + dy * dy <= pow(flower_size, 2)) {
+                    // Set the color of the pixel to represent the flower
+                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color. The bigger the corolla size, the brighter red the color
+                }
+            }
+        }
+    }
+}
+
+// ------------scrap -------------------------------
 //    for (int timestep = 0; timestep < series_corolla_size.size(); timestep++) {
 //        // Append data point to the series for the current time step
-//        series->append(timestep, series_corolla_size[timestep]);
+//        series_corolla_size->append(timestep, series_corolla_size[timestep]);
 //    }
-}
+
 
 // ------------------------------------------------
 //        std::vector<int> corollaSizeSnapshot;
@@ -258,45 +308,45 @@ void MainWindow::draw_chart() {
 //        series_corolla_size.push_back(corollaSizeSnapshot);
 // ------------------------------------------------
 
-    //    // Create a chart
-    //    QChart *chart = new QChart();
-    //    chart->setTitle("Flower Corolla Size");
-    //    chart->setAnimationOptions(QChart::SeriesAnimations);
+//    // Create a chart
+//    QChart *chart = new QChart();
+//    chart->setTitle("Flower Corolla Size");
+//    chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    //    // Create a bar series
-    //    QBarSeries *series = new QBarSeries();
-    //    series->setLabelsVisible(true);
+//    // Create a bar series
+//    QBarSeries *series = new QBarSeries();
+//    series->setLabelsVisible(true);
 
-    //    // Create the categories
-    //    QStringList categories;
-    //    for (auto& flower : flowers) {
-    //        categories << QString::number(flower.id);
-    //    }
+//    // Create the categories
+//    QStringList categories;
+//    for (auto& flower : flowers) {
+//        categories << QString::number(flower.id);
+//    }
 
-    //    // Create the data
-    //    QBarSet *set = new QBarSet("Corolla Size");
-    //    for (auto& flower : flowers) {
-    //        *set << flower.corolla_size;
-    //    }
+//    // Create the data
+//    QBarSet *set = new QBarSet("Corolla Size");
+//    for (auto& flower : flowers) {
+//        *set << flower.corolla_size;
+//    }
 
-    //    // Add the data to the series
-    //    series->append(set);
+//    // Add the data to the series
+//    series->append(set);
 
-    //    // Add the series to the chart
-    //    chart->addSeries(series);
+//    // Add the series to the chart
+//    chart->addSeries(series);
 
-    //    // Set the categories on the horizontal axis
-    //    QBarCategoryAxis *axis = new QBarCategoryAxis();
-    //    axis->append(categories);
-    //    chart->createDefaultAxes();
-    //    chart->setAxisX(axis, series);
+//    // Set the categories on the horizontal axis
+//    QBarCategoryAxis *axis = new QBarCategoryAxis();
+//    axis->append(categories);
+//    chart->createDefaultAxes();
+//    chart->setAxisX(axis, series);
 
-    //    // Create a chart view
-    //    QChartView *chartView = new QChartView(chart);
-    //    chartView->setRenderHint(QPainter::Antialiasing);
+//    // Create a chart view
+//    QChartView *chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
 
-    //    // Set the chart view as the central widget
-    //    ui->chart->setCentralWidget(chartView);
+//    // Set the chart view as the central widget
+//    ui->chart->setCentralWidget(chartView);
 
 
 // -------------------- for death start -----------------------------------
@@ -332,37 +382,6 @@ void MainWindow::draw_chart() {
 //}
 // --------------------for death end -----------------------------------
 
-void MainWindow::update_map_image() {
-    // Clear the existing image
-    image.fill(QColor(Qt::green).lighter(130));
-
-    // Draw all the flowers onto the image
-    for (const auto& flower : flowers) {
-        //        draw_flower(image, flower);
-        draw_flower(image, flower);
-    }
-
-    // Update the scene with the new image
-    scene->clear();
-    scene->addPixmap(QPixmap::fromImage(image));
-}
-
-//void MainWindow::draw_flower(QImage& image, const flower& flowers) {
-void MainWindow::draw_flower(QImage& image, const flower& flower) {
-    // draw a flower onto the image
-    for (const auto& flower : flowers) {
-        // Redraw the flower if it's alive
-        for (int dx = -flower_size; dx <= flower_size; dx++) {
-            for (int dy = -flower_size; dy <= flower_size; dy++) {
-                // Check if the current pixel is within the circle
-                if (dx * dx + dy * dy <= pow(flower_size, 2)) {
-                    // Set the color of the pixel to represent the flower
-                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size /100, 0, 0)); // set pixel color. The bigger the corolla size, the brighter red the color
-                }
-            }
-        }
-    }
-}
 
 //void MainWindow::plotScaledImage() {
 //    scene->clear();
