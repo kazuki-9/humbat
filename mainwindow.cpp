@@ -31,47 +31,40 @@ MainWindow::MainWindow(QWidget *parent)
 {
     // Initialize start time and maximum simulation time
     startTime = std::chrono::steady_clock::now();
-    maxSimulationTimeInSeconds = 3; // Set the maximum simulation time to 60 seconds
+    maxSimulationTimeInSeconds = 3; // Set the maximum simulation time to 60 seconds // not used atm
+
     // Set up the UI
     ui->setupUi(this);
-    setup_map();
+    setup_map(); // set up the map for the first time without any flowers
 
      // Setting up the chart for plotting
-    chart = new QChart();
-    series = new QLineSeries();
-    series->setColor(Qt::red); // default color: blue
-    series->setName("Flowers");
-
-   chart->addSeries(series);  // a chart can have more than one series
-
+    chart = new QChart();    
     chart->createDefaultAxes();
-
     chart->axisX()->setTitleText("Time [t]");
     chart->axisY()->setTitleText("Corolla size [mm]");
     chart->setTitle("<H2>Flower evolution model</H2>");
 
-
     ui->my_chart->setChart(chart);
 }
 
-bool MainWindow::stopConditionMet() {
-    // Get the current time
-    auto currentTime = std::chrono::steady_clock::now();
+MainWindow::~MainWindow() {  delete ui; } // Destructor definition
 
-    // Calculate the elapsed time since the simulation started
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+//bool MainWindow::stopConditionMet() { // not used atm
+//    // Get the current time
+//    auto currentTime = std::chrono::steady_clock::now();
 
-    // Check if the elapsed time exceeds the maximum simulation time
-    return (elapsedTime >= maxSimulationTimeInSeconds);
-}
+//    // Calculate the elapsed time since the simulation started
+//    auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+
+//    // Check if the elapsed time exceeds the maximum simulation time
+//    return (elapsedTime >= maxSimulationTimeInSeconds);
+//}
 
 random_device rd;     // Only used once to initialise (seed) engine
 mt19937 rng(rd());    // Random-number engine used (Mersenne-Twister in this case)
 uniform_int_distribution<int> uni_x(flower_size, x_map -flower_size); // Guaranteed unbiased
 uniform_int_distribution<int> uni_y(flower_size, y_map -flower_size);
 
-
-MainWindow::~MainWindow() {  delete ui; } // Destructor definition
 
 void MainWindow::setup_map() {
     scene = new QGraphicsScene;
@@ -88,35 +81,31 @@ void MainWindow::setup_map() {
 void MainWindow::on_setup_clicked()
 {
     scene->clear();
-    setup_map();
-    setup_flowers();
+    setup_map();    // Renew the map
+    setup_flowers();// with flowers
+    // Clear the series before adding new data
+//    series->clear();
+    setup_chart();
 }
 
-vector<int> flower_ids;
 vector<flower> flowers;
 uniform_int_distribution<int> uni_c(30, 100);
 
 void MainWindow::setup_flowers(){
     flowers.clear();
     // Set the size of each flower
-    int n_flowers = ui->spinBox_flowers->value();
+    unsigned n_flowers = ui->spinBox_flowers->value();
     // Draw flowers randomly in the patch
     for (unsigned i = 0; i < n_flowers; i++)
     {
-        flowers.emplace_back(std::vector<int>{}, 0, 20, i);  // variables are xy_cor, age, corolla_size, id
+        flowers.emplace_back(std::vector<int>{}, 0, 0, 20, i);  // variables are xy_cor, age, corolla_size, id
         flowers[i].xy_cor = {uni_x(rng), uni_y(rng)};          // assign random x and y coordinates
         flowers[i].corolla_size = uni_c(rng);                   // update flower parameters
         flowers[i].id = i + 1;                                        // assign flower id
-        flower_ids.push_back(i);
         //        cout << '('<<flowers[i].xy_cor[0] <<','<< flowers[i].xy_cor[1] <<')'<< ", corolla size " << flowers[i].corolla_size << endl;
         //        cout <<','<< flowers[i].age <<')'<< ", corolla size " << flowers[i].corolla_size << endl;
 
-        // add flower id to flower_ids vector
         // draw flowers
-
-        //        int x = static_cast<int>(flowers[i].xy_cor[0]);
-        //        int y = static_cast<int>(flowers[i].xy_cor[1]);
-
         for (int dx = -flower_size; dx <= flower_size; dx++) {
             for (int dy = -flower_size; dy <= flower_size; dy++) {
                 // Check if the current pixel is within the circle
@@ -139,12 +128,22 @@ void MainWindow::on_start_clicked()
     update_map();
 }
 
+void MainWindow::setup_chart() {
+    int x_min = 0;
+    int x_max = 1000;
+    int y_min = 30;
+    int y_max = 100;
+    // Set the range
+    chart->axisX()->setRange(x_min, x_max);
+    chart->axisY()->setRange(y_min, y_max);
+}
 
 //      void simulateTime(std::vector<flower>& flowers) {
 uniform_int_distribution<int> uni_d(-3, 3); // Randomly select the direction of movement
 uniform_int_distribution<int> uni_c_change(0, 1); // Randomly select the degree of change in corolla size
 
 std::uniform_real_distribution<float> randomFloat_0_1;
+std::vector<int> series_corolla_size;
 
 void MainWindow::update_map() {
     int maxIterations = 2000;
@@ -160,10 +159,10 @@ void MainWindow::update_map() {
         // Update the parameters of existing flowers
         for (auto& flower : flowers) {
             // Simulate aging
-            flower.age++;
+            flower.time_elapsed++;
             // Renew flower parameters if needed
-            if (flower.age > 100) {
-                flower.age = 0;
+            if (flower.time_elapsed % 100 == 0) { // after 100 steps, 1 generation increment
+                flower.generation++;
                 if (flower.corolla_size<= min(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())) {
                     flower.corolla_size -= uni_c_change(rng);
                 } else if (flower.corolla_size > max(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())){
@@ -195,14 +194,23 @@ void MainWindow::update_map() {
                 flower.xy_cor = {new_x, new_y};
 
             }
-            cout << "id " << flower.id <<", age " << flower.age <<", corolla size "<< flower.corolla_size << endl;
+            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
         }
         // Update the map with the current state of flowers
         update_map_image();
-        if (iterationCount % 100 == 0)
-        {
+
+
+//        if (iterationCount % 100 == 0)
+//        {
+//            // Initialize series_corolla_size with the same size as the number of flowers
+//            series_corolla_size.resize(flowers.size());
+
+//            for (size_t i = 0 ; i < flowers.size(); i++) {
+//                //        std::vector<int>& corolla_size_data = series_corolla_size[i];
+//                series_corolla_size.push_back(flowers[i].corolla_size);
+
+//        }
             draw_chart();
-        }
         //        if (stopConditionMet()) {
         //            break; // Exit the loop if the condition is met
         //        }
@@ -212,32 +220,33 @@ void MainWindow::update_map() {
 }
 
 
-std::vector<std::vector<int>> series_corolla_size;
+
+void MainWindow::make_series(){
+
+
+//for (size_t i = 0 ; i < flowers.size(); i++) {
+//    // Create a new QLineSeries for each flower
+//            series_list[i]->setColor(QColor(255, flowers[i].id * 12, 0));
+//            series_list[i]->setName("Flower" + QString::number(flowers[i].id));
+
+//            series_list[i]->append(timestep, series_corolla_size[timestep]);
+//            chart->addSeries(series);
+//    // Add corolla size data for each time step
+//    for (int timestep = 0; timestep < series_corolla_size[i]; timestep++) {
+//            // Append data point to the series for the current time step
+//            // Assuming each iteration represents 100 time steps
+//    }
+//}
+
+
+}
+
 void MainWindow::draw_chart() {
 
-    int xMin = 0;
-    int xMax = 2000;
-    int yMin = 30;
-    int yMax = 100;
-
-    // Clear the series before adding new data
-    series->clear();
-
-    for (int i = 0 ; i < n_flowers; i++) {
-        std::vector<int>& corolla_size_data = series_corolla_size[i];
-
-        // Add corolla size data for each time step
-        for (int timestep = 0; timestep < corolla_size_data.size(); timestep++) {
-            int corolla_size = corolla_size_data[timestep];
-            // Append data point to the series for the current time step
-            series->append(timestep, corolla_size);
-        }
-        chart->axisX()->setRange(xMin, xMax); // xMin, xMax are just placeholders
-        chart->axisY()->setRange(yMin, yMax); // yMin, yMax are just placeholders
-
-        // series->clear(); // deletes all data points
-        //    series->append(xMin, series_corolla_size); // adds a data point; xValue could be a time step and yValue the population size
-    }
+//    for (int timestep = 0; timestep < series_corolla_size.size(); timestep++) {
+//        // Append data point to the series for the current time step
+//        series->append(timestep, series_corolla_size[timestep]);
+//    }
 }
 
 // ------------------------------------------------
@@ -336,8 +345,6 @@ void MainWindow::update_map_image() {
     // Update the scene with the new image
     scene->clear();
     scene->addPixmap(QPixmap::fromImage(image));
-    //    plotScaledImage();
-    //    QCoreApplication::processEvents();
 }
 
 //void MainWindow::draw_flower(QImage& image, const flower& flowers) {

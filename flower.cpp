@@ -7,25 +7,24 @@
 
 flower::flower(
     std::vector<int> xy_cor,
-    int age, // for renewing the variables
+    int time_elapsed,
+    int generation,
     int corolla_size, // in mm
-//    double death_rate, // per year
     int id)
-    : xy_cor(xy_cor), age(age), corolla_size(corolla_size), id(id)
-//    , is_alive(true)
+    : xy_cor(xy_cor), time_elapsed(time_elapsed), generation(generation), corolla_size(corolla_size), id(id)
 
 {
         this -> xy_cor = xy_cor;
-        this -> age = age;
+        this -> time_elapsed = time_elapsed;
+        this -> generation = generation;
         this -> corolla_size = corolla_size;
-//        this -> death_rate = death_rate;
 }
 
 bool flower::operator==(const flower& other) const {
         // Compare each member variable for equality
         return (this->xy_cor == other.xy_cor) &&
-               (this->age == other.age) &&
+               (this->time_elapsed == other.time_elapsed) &&
+               (this->generation == other.generation) &&
                (this->corolla_size == other.corolla_size) &&
-//               (this->death_rate == other.death_rate) &&
                (this->id == other.id);
 }
