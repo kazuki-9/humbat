@@ -1,221 +1,144 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include "flower.h"
-#include <QColor>
+#include <QGraphicsScene>
+#include <QMainWindow>
 #include <QLineSeries>
 #include <QChart>
 #include <random>
-#include <QImage>
-#include <iostream>
 #include <vector>
-#include <QGraphicsScene>
-#include <algorithm>
+
+#include "ui_mainwindow.h"
+
+//#include <QtCharts>
+//#include <QLineSeries>
+//#include <QChart>
 
 using namespace std;
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-    ui(new Ui::MainWindow) {
-    ui->setupUi(this);
-    setup_map(); // set up the map for the first time without any flowers
-    setup_chart(); // set up the chart for the first time without any flowers
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
 
-    uni_x = uniform_int_distribution<int> (flower_size, x_map -flower_size); // Randomly select the x coordinate
-    uni_y = uniform_int_distribution<int> (flower_size, y_map -flower_size); // Randomly select the y coordinate
-    uni_c = uniform_int_distribution<int> (min_corolla_size, max_corolla_size); // Randomly select the corolla size
-    uni_d = uniform_int_distribution<int> (-3, 3); // Randomly select the direction of movement
-    uni_c_change = uniform_int_distribution<int> (0, 1); // Randomly select the degree of change in corolla size
-}
+public:
+    MainWindow(QWidget *parent = nullptr); // Declaration of the constructor
+    ~MainWindow(); // Declaration of the destructor
 
-MainWindow::~MainWindow() {  delete ui; } // Destructor definition
+    int flower_size = 4;
 
-void MainWindow::setup_chart() {    // Setting up the chart for plotting the corolla size change over generations
-    chart = new QChart();
-    series_1 = new QLineSeries();    
-    chart->addSeries(series_1);
-    chart->createDefaultAxes();
-    chart->axisX()->setTitleText("Time [generations]");
-    chart->axisY()->setTitleText("Corolla size [mm]");
-    chart->setTitle("<H2>Flower evolution model</H2>");
+private slots:
+    void on_setup_clicked();
+    void on_start_clicked();
 
-    int x_min = 0;
-    int x_max = 200; // plot only until 200 generations later
-    int y_min = min_corolla_size;
-    int y_max = max_corolla_size;
-    // Set the range
-    chart->axisX()->setRange(x_min, x_max);
-    chart->axisY()->setRange(y_min, y_max);
+private:
+    Ui::MainWindow *ui;
 
-    ui->my_chart->setChart(chart); // Set the chart to the view
-}
+    // Project Data Storage
+    std::vector<flower> flowers;
 
-random_device rd;     // Only used once to initialise (seed) engine
-mt19937 rng(rd());   // random-number engine used (Mersenne-Twister in this case)
+    // Chart series
+    QLineSeries *series_1; // represents storage for the data points
+    QLineSeries *series_2;
+    QLineSeries *series_3;
+    QLineSeries *series_4;
+    QLineSeries *series_5;
+    QLineSeries *series_6;
+    QLineSeries *series_7;
+    QLineSeries *series_8;
+    QLineSeries *series_9;
+    QLineSeries *series_10;
+    QLineSeries *series_11;
+    QLineSeries *series_12;
+    QLineSeries *series_13;
+    QLineSeries *series_14;
+    QLineSeries *series_15;
+    QLineSeries *series_16;
+    QLineSeries *series_17;
+    QLineSeries *series_18;
+    QLineSeries *series_19;
+    QLineSeries *series_20;
 
-void MainWindow::setup_map() {
-    scene = new QGraphicsScene;
-    ui->map->setScene(scene);
-    ui->map->resize(x_map, y_map); // resize the map
-    image = QImage(x_map, y_map, QImage::Format_ARGB32); //@ Format_ARGB32 is a 32-bit RGB format
-    image.fill(QColor(Qt::green).lighter(130)); // Adjust the alpha value to make it light green
-    scene->addPixmap(QPixmap::fromImage(image));
-}
+    QChart *chart;
 
-void MainWindow::on_setup_clicked() {
-    scene->clear();
-    setup_map();    // Renew the map
-    setup_flowers();// , with flowers
-}
+    // Random number generator
+    random_device rd;     // Only used once to initialise (seed) engine
 
-vector<flower> flowers;
-void MainWindow::setup_flowers() { // Assign variables to flowers and draw them on the map
-    //    scene->clear();
-    flowers.clear();
-    // Set the size of each flower
-    unsigned n_flowers = ui->spinBox_flowers->value();
-    // Draw flowers randomly in the patch
-    for (unsigned i = 0; i < n_flowers; i++) {
-        flowers.emplace_back(std::vector<int>{}, 0, 0, 0, i);  // variables are xy_cor, time_elapsed, generation, corolla_size, id
-        flowers[i].xy_cor = {uni_x(rng), uni_y(rng)};          // assign random x and y coordinates
-        flowers[i].corolla_size = uni_c(rng);                   // update flower parameters
-        flowers[i].id = i + 1;                                        // assign flower id
-        //        cout << '('<<flowers[i].xy_cor[0] <<','<< flowers[i].xy_cor[1] <<')'<< ", corolla size " << flowers[i].corolla_size << endl;
+    uniform_int_distribution<int> uni_x; // Guaranteed unbiased
+    uniform_int_distribution<int> uni_y;
 
-        // draw flowers
-        for (int dx = -flower_size; dx <= flower_size; dx++) {
-            for (int dy = -flower_size; dy <= flower_size; dy++) {
-                // Check if the current pixel is within the circle
-                if (dx * dx + dy * dy <= pow(flower_size, 2)) {
-                    // Set the color of the pixel to represent the flower
-                    image.setPixel(flowers[i].xy_cor[0] + dx, flowers[i].xy_cor[1] + dy, qRgb(255* flowers[i].corolla_size / max_corolla_size, 0, 0)); // set pixel color
-                }
-            }
-        }
-    }
-    scene->addPixmap(QPixmap::fromImage(image));
-}
+    uniform_int_distribution<int> uni_d; // Randomly select the direction of movement
+    uniform_int_distribution<int> uni_c_change; // Randomly select the degree of change in corolla size
+    uniform_real_distribution<float> randomFloat_0_1; // Generate random number between 0 and 1 for selection either by hummingbirds or bats
+    uniform_int_distribution<int> uni_c; // Randomly select the corolla size
 
-void MainWindow::on_start_clicked() {
-    ui->start->setEnabled(false);
-    QCoreApplication::processEvents(); // make sure to update the UI
-    update_map();
-    unit_test();
-    ui->start->setEnabled(true); 
-}
+    // Parameters
+    const int x_map = 300; // size of the map in x-y direction
+    const int y_map = 300;
+    const unsigned n_flowers = 0; // number of flowers, initialized with 0
+    const int min_corolla_size = 30;
+    const int max_corolla_size = 100;
 
-void MainWindow::update_map() {
-    // flower generation
-    int max_iterations = 500; // number of iterations till stop
-    for (int iteration_count = 0; iteration_count < max_iterations; ++iteration_count) {
-        // Update the parameters of existing flowers
-        for (auto& flower : flowers) {
-            // Simulate aging
-            flower.time_elapsed++;
-            // Renew flower parameters if needed
-            if (flower.time_elapsed % 100 == 0) { // after 100 steps, 1 generation increment
-                flower.generation++;    // This reflect the death of old generation and birth of new generation, assuming all the flowers
-                    // have a offspring near their original position, with other variables
-                if (flower.corolla_size<= min(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())) { // if the flower is within the range of hummingbirds
-                    flower.corolla_size -= uni_c_change(rng); // decrease the corolla size
-                } else if (flower.corolla_size > max(ui->spinBox_hums_range_max->value(), ui->spinBox_bats_range_min->value())){ // if the flower is within the range of bats
-                    flower.corolla_size += uni_c_change(rng); // increase the corolla size
-                } else if (flower.corolla_size > ui->spinBox_bats_range_min->value() && flower.corolla_size<= ui->spinBox_hums_range_max->value()) { // Competition between bats and hummingbirds
-                    if (randomFloat_0_1(rng) > 0.5) { // 50% chance of increasing or decreasing the corolla size
-                        flower.corolla_size += uni_c_change(rng);
-                    } else {
-                        flower.corolla_size -= uni_c_change(rng);
-                    }
-                }
-                // Ensure corolla size is within the range
-                if (flower.corolla_size < min_corolla_size) {
-                    flower.corolla_size = min_corolla_size;
-                } else if (flower.corolla_size > max_corolla_size) {
-                    flower.corolla_size = max_corolla_size;
-                }              
-                // Simulate movement
-                int new_x = flower.xy_cor[0] + uni_d(rng);
-                int new_y = flower.xy_cor[1] + uni_d(rng);
-                new_x = std::max(flower_size, std::min(new_x, x_map - flower_size - 1)); // Ensure the new coordinates stay within the map boundaries
-                new_y = std::max(flower_size, std::min(new_y, y_map - flower_size - 1)); // Chat GPT
-                flower.xy_cor = {new_x, new_y}; // Assign new n-y coordinates for move-appearance between generations
-                // Fill the series with the new data
-                series_1->setColor(QColor(255, flowers[0].id * 12, 0));
-                series_1->setName("F " + QString::number(flowers[0].id));
-                series_1->append(flowers[0].generation, flowers[0].corolla_size);
-            }
-        }
-        update_map_image(); // Update the map with the current state of flowers
-    }
-    chart->addSeries(series_1);
-}
+    // QImage
+    QImage image;
+    std::vector<QRgb> color;
+    QGraphicsScene *scene;
 
-void MainWindow::update_map_image() {
-    scene->clear(); // Update the scene with the new image
-    image.fill(QColor(Qt::green).lighter(130)); // Clear the existing image
-    for (const auto& flower : flowers) { // Draw all the flowers onto the image
-        draw_flower(image, flower);
-    }
-    scene->addPixmap(QPixmap::fromImage(image)); // Add the image to the scene
-}
+    // Functions
+    void setup_map();
+    void setup_flowers();
+    void update_map();
+    void draw_flower(QImage& image, const flower& f);
+    void update_map_image();
 
-void MainWindow::draw_flower(QImage& image, const flower& flower) { // Re-draw the flower onto the image with the updated xy-coordinates
-    for (const auto& flower : flowers) {
-        // Redraw the flower for the next generations
-        for (int dx = -flower_size; dx <= flower_size; dx++) {
-            for (int dy = -flower_size; dy <= flower_size; dy++) {
-                // Check if the current pixel is within the circle
-                if (dx * dx + dy * dy <= pow(flower_size, 2)) {
-                    // Set the color of the pixel to represent the flower
-                    // The bigger the corolla size, the brighter red the color is.
-                    image.setPixel(flower.xy_cor[0] + dx, flower.xy_cor[1] + dy, qRgb(255* flower.corolla_size / max_corolla_size, 0, 0));
-                }
-            }
-        }
-    }
-}
+    void setup_chart();
+    void make_series();
+    void draw_chart();
 
-bool MainWindow::unit_test() { // Unit test
-    int result1 = flowers[0].corolla_size; // index [0], or any arbitrary flower
-    if (result1 > max_corolla_size || result1 < min_corolla_size) {
-        cout << "Unit test failed :(" << endl;
-        return false;
-    }
-    cout << "Unit test cleared :)" << endl;
-    return true;
-}
+    void calculate_average();
 
-// ------------scrap -------------------------------
+    bool unit_test();
+};
 
-//void MainWindow::calculate_average() {
-//    int sum = 0;
-////    for (const auto& flower : flowers) {
-//        sum += flower.corolla_size;
-////    }
-//    int average = sum / flowers.size();
-//    cout << "Average corolla size: " << average << endl;
-//----------------------------------------------
-//        calculate_average();
-//                int sum = 0;
-//                sum += flower.corolla_size;
-//                //    }
-//                int average = sum / n_flowers;
-//            cout << "id " << flower.id <<", generation " << flower.generation <<", corolla size "<< flower.corolla_size << endl;
-//        cout << "Average corolla size: " << average << endl;
-//            series_2->append(flower.generation, average);
+#endif // MAINWINDOW_H
 
-
-
-//    for (int timestep = 0; timestep < series_corolla_size.size(); timestep++) {
-//        // Append data point to the series for the current time step
-//        series_corolla_size->append(timestep, series_corolla_size[timestep]);
-//    }
-
-
-// ------------------------------------------------
-//        std::vector<int> corollaSizeSnapshot;
-//        for (const auto& flower : flowers) {
-//            corollaSizeSnapshot.push_back(flower.corolla_size);
-//        }
-
-//        series_corolla_size.push_back(corollaSizeSnapshot);
-// ------------------------------------------------
+/* **************************
+ * *** About this program ***
+ * **************************
+ *
+ * Author: Kazuki Uchino
+ * Matriculation number: 29225754
+ *
+ * *** RESEARCH QUESTION: ***
+ *
+ * Will flowers evolve in a way so that they will prefer bats (or hummingbirds) as their pollinators?
+ *
+ * *** BACKGROUND INFORMATION: ***
+ *
+ * Hummingbirds are known to fly around to get nectar from nectarious plants while they unintentionally pollinate the plants.
+ * Some bat species in Mexico are also known to feed on nectar in night time, through which, again, they pollinate the plants.
+ * A research from Muchhala (2007) shows that while hummingbirds forage for narrower flowers and are less efficient in pollination,
+ * bats forage for wider flowers and are more efficient in pollination. Due to the higher feedback on plants' pollen production,
+ * a model shows that the plants' evolutionary shifts from bird to bat pollination (Muchhala and Thomson, 2010).
+ * # References:
+ * -	Muchhala, Nathan (2007): Adaptive trade-off in floral morphology mediates specialization for flowers pollinated by bats and hummingbirds. In The American Naturalist 169 (4), pp. 494–504. DOI: 10.1086/512047.
+ * -	Muchhala, Nathan; Thomson, James D. (2010): Fur versus feathers: pollen delivery by bats and hummingbirds and consequences for pollen production. In The American Naturalist 175 (6), pp. 717–726. DOI: 10.1086/652473.
+ *
+ * ABOUT THIS PROGRAM: ***
+ *
+ * The program simulates the process of pollination by hummingbirds and bats.
+ * How to use the program: the user can set up the parameters for the simulation, such as the number of flowers and the target
+ * corolla size of hummingbirds and bats for the flowers. The output of the program is a graphical representation of the number
+ * of flowers with different corolla size over generations.
+ * The research suggests that there are no competition between the two pollinators for flowers with intermediate corolla size, and
+ * but the user can also simulate such competition.
+ * An enhanced version of the program may include functionalities such as moving the pollinators and their behaviours (e.g. bats
+ * eat pollens during the pollination process). Other functions such as pollen productivity of flowers and fitness of pollinators
+ * could also complement the program well.
+ *
+ * *** SOURCES: ***
+ *
+ * Variables of flower are specified in the flower.h file.
+ * Almost everyting is in the mainwindow.cpp file.
+ *
+ */
