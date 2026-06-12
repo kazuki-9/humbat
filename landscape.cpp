@@ -1,6 +1,9 @@
 #include "landscape.h"
 #include <random>
 
+// Added default constructor declaration fix to match header spec
+landscape::landscape() : x_map(0), y_map(0) {}
+
 landscape::landscape(
     const unsigned x_map,
     const unsigned y_map)
