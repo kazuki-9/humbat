@@ -26,3 +26,30 @@ humbat/
     ├── flower.h             # Flower class definition and attributes
     ├── landscape.cpp        # Environmental map configuration logic
     └── landscape.h          # Landscape class definitions
+```
+
+## Setup and Installation
+Dependencies:
+- Qt 5 or Qt 6 Framework
+- Qt Charts module
+- C++17 compliant compiler
+
+## Building from Command Line
+1. Clone the repository to your local system.
+
+2. Navigate to the root directory containing humbat.pro.
+
+3. Generate the Makefile and compile:
+
+```text
+Bash
+qmake humbat.pro
+make
+```
+
+## Usage
+1. Set Up Map: Enter the initial flower population count in the spin box (default: 10) and click Set up. This randomly populates the green 300x300 canvas grid.
+
+2. Configure Selectivity Targets: Modify the minimum and maximum target corolla size bounds for hummingbirds and bats using the provided UI parameter spin boxes.
+
+3. Execute Simulation: Click Start to run the processing loop through generations. The canvas maps positional drift, and the Real-time Chart renders the corolla size trends over time.
