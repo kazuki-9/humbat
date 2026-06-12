@@ -1,6 +1,5 @@
 #include "flower.h"
 
-
 //flower::flower()
 //{
 //}
@@ -12,12 +11,8 @@ flower::flower(
     int corolla_size, // in mm
     int id)
     : xy_cor(xy_cor), time_elapsed(time_elapsed), generation(generation), corolla_size(corolla_size), id(id)
-
 {
-        this -> xy_cor = xy_cor;
-        this -> time_elapsed = time_elapsed;
-        this -> generation = generation;
-        this -> corolla_size = corolla_size;
+    // Cleaned up duplicate inline initializers while maintaining formatting intent
 }
 
 bool flower::operator==(const flower& other) const {
