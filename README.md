@@ -1,7 +1,6 @@
 # Humbat: Flower Evolution Model Simulation
 
 Author: Kazuki Uchino  
-Matriculation Number: 29225754
 
 ## Research Question
 Will flowers evolve in a way so that they will prefer bats or hummingbirds as their pollinators?
