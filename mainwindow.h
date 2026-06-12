@@ -2,11 +2,14 @@
 #define MAINWINDOW_H
 
 #include "flower.h"
-#include "qlineseries.h"
-#include "ui_mainwindow.h"
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <QLineSeries>
+#include <QChart>
 #include <random>
+#include <vector>
+
+#include "ui_mainwindow.h"
 
 //#include <QtCharts>
 //#include <QLineSeries>
@@ -30,6 +33,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    // Project Data Storage
+    std::vector<flower> flowers;
 
     // Chart series
     QLineSeries *series_1; // represents storage for the data points
@@ -109,30 +115,30 @@ private:
  *
  * *** BACKGROUND INFORMATION: ***
  *
- *  Hummingbirds are known to fly around to get nectar from nectarious plants while they unintentionally pollinate the plants.
- *  Some bat species in Mexico are also known to feed on nectar in night time, through which, again, they pollinate the plants.
- *  A research from Muchhala (2007) shows that while hummingbirds forage for narrower flowers and are less efficient in pollination,
- *  bats forage for wider flowers and are more efficient in pollination. Due to the higher feedback on plants' pollen production,
- *  a model shows that the plants' evolutionary shifts from bird to bat pollination (Muchhala and Thomson, 2010).
- *  # References:
- *  -	Muchhala, Nathan (2007): Adaptive trade-off in floral morphology mediates specialization for flowers pollinated by bats and hummingbirds. In The American Naturalist 169 (4), pp. 494–504. DOI: 10.1086/512047.
- *  -	Muchhala, Nathan; Thomson, James D. (2010): Fur versus feathers: pollen delivery by bats and hummingbirds and consequences for pollen production. In The American Naturalist 175 (6), pp. 717–726. DOI: 10.1086/652473.
+ * Hummingbirds are known to fly around to get nectar from nectarious plants while they unintentionally pollinate the plants.
+ * Some bat species in Mexico are also known to feed on nectar in night time, through which, again, they pollinate the plants.
+ * A research from Muchhala (2007) shows that while hummingbirds forage for narrower flowers and are less efficient in pollination,
+ * bats forage for wider flowers and are more efficient in pollination. Due to the higher feedback on plants' pollen production,
+ * a model shows that the plants' evolutionary shifts from bird to bat pollination (Muchhala and Thomson, 2010).
+ * # References:
+ * -	Muchhala, Nathan (2007): Adaptive trade-off in floral morphology mediates specialization for flowers pollinated by bats and hummingbirds. In The American Naturalist 169 (4), pp. 494–504. DOI: 10.1086/512047.
+ * -	Muchhala, Nathan; Thomson, James D. (2010): Fur versus feathers: pollen delivery by bats and hummingbirds and consequences for pollen production. In The American Naturalist 175 (6), pp. 717–726. DOI: 10.1086/652473.
  *
- *  ABOUT THIS PROGRAM: ***
+ * ABOUT THIS PROGRAM: ***
  *
- *  The program simulates the process of pollination by hummingbirds and bats.
- *  How to use the program: the user can set up the parameters for the simulation, such as the number of flowers and the target
- *  corolla size of hummingbirds and bats for the flowers. The output of the program is a graphical representation of the number
- *  of flowers with different corolla size over generations.
- *  The research suggests that there are no competition between the two pollinators for flowers with intermediate corolla size, and
- *  but the user can also simulate such competition.
- *  An enhanced version of the program may include functionalities such as moving the pollinators and their behaviours (e.g. bats
- *  eat pollens during the pollination process). Other functions such as pollen productivity of flowers and fitness of pollinators
- *  could also complement the program well.
+ * The program simulates the process of pollination by hummingbirds and bats.
+ * How to use the program: the user can set up the parameters for the simulation, such as the number of flowers and the target
+ * corolla size of hummingbirds and bats for the flowers. The output of the program is a graphical representation of the number
+ * of flowers with different corolla size over generations.
+ * The research suggests that there are no competition between the two pollinators for flowers with intermediate corolla size, and
+ * but the user can also simulate such competition.
+ * An enhanced version of the program may include functionalities such as moving the pollinators and their behaviours (e.g. bats
+ * eat pollens during the pollination process). Other functions such as pollen productivity of flowers and fitness of pollinators
+ * could also complement the program well.
  *
- *  *** SOURCES: ***
+ * *** SOURCES: ***
  *
- *  Variables of flower are specified in the flower.h file.
- *  Almost everyting is in the mainwindow.cpp file.
+ * Variables of flower are specified in the flower.h file.
+ * Almost everyting is in the mainwindow.cpp file.
  *
  */
